@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ConnectButton } from '@mysten/dapp-kit-react';
+import { useWalletConnection } from '@mysten/dapp-kit-react';
 import { 
   Layers, 
   Search, 
@@ -16,6 +16,7 @@ import { useState } from 'react';
 
 const navItems = [
   { label: 'Discover', href: '/discover', icon: Search },
+  { label: 'AI Analyst', href: '/ai-analyst', icon: Layers },
   { label: 'Marketplace', href: '/marketplace', icon: Layers },
   { label: 'Governance', href: '/governance', icon: Wallet },
 ];
@@ -23,6 +24,8 @@ const navItems = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const connection = useWalletConnection();
+  const isConnected = connection.isConnected;
 
   return (
     <div className="min-h-screen bg-background">
@@ -82,9 +85,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </button>
 
               {/* Wallet Connect */}
-              <ConnectButton 
-                className="!bg-accent-primary !text-white !px-4 !py-2 !rounded-lg !text-sm !font-medium hover:!bg-accent-hover transition-colors"
-              />
+              <button
+                className="bg-accent-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-accent-hover transition-colors"
+              >
+                {isConnected ? connection.account?.label || 'Connected' : 'Connect Wallet'}
+              </button>
 
               {/* Mobile Menu */}
               <button 

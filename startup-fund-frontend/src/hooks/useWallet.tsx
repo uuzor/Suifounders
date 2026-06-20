@@ -4,7 +4,7 @@
  * Custom wallet connection hook with enhanced functionality
  */
 
-import { useCurrentAccount, useDAppKit, useCurrentWallet, useCurrentNetwork } from '@mysten/dapp-kit-react';
+import { useCurrentAccount, useCurrentNetwork, useWalletConnection } from '@mysten/dapp-kit-react';
 import { useState, useCallback } from 'react';
 import type { TransactionResult } from '@/lib/contracts/types';
 import { getExplorerUrl } from '@/lib/contracts/transactions';
@@ -13,47 +13,28 @@ import { getExplorerUrl } from '@/lib/contracts/transactions';
 
 export function useWallet() {
   const account = useCurrentAccount();
-  const dAppKit = useDAppKit();
-  const { connectionStatus, wallet } = useCurrentWallet();
+  const connection = useWalletConnection();
   const network = useCurrentNetwork();
 
-  const isConnected = !!account;
+  const isConnected = connection.isConnected;
   const address = account?.address || null;
 
   const shortAddress = address 
     ? `${address.slice(0, 6)}...${address.slice(-4)}`
     : null;
 
-  const connect = useCallback(async () => {
-    try {
-      await dAppKit.connectWallet();
-    } catch (error) {
-      console.error('Failed to connect wallet:', error);
-      throw error;
-    }
-  }, [dAppKit]);
-
-  const disconnect = useCallback(async () => {
-    try {
-      await dAppKit.disconnectWallet();
-    } catch (error) {
-      console.error('Failed to disconnect wallet:', error);
-      throw error;
-    }
-  }, [dAppKit]);
-
   return {
     // Connection state
     isConnected,
     address,
     shortAddress,
-    connectionStatus,
-    wallet,
+    connectionStatus: connection.status,
+    wallet: connection.wallet,
     network,
     
-    // Actions
-    connect,
-    disconnect,
+    // Actions (no-op in v2, wallet handles connection)
+    connect: () => {},
+    disconnect: () => {},
     
     // Explorer
     getExplorerUrl: (digest: string) => getExplorerUrl(digest, network),
@@ -67,9 +48,9 @@ export function useTransaction() {
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const execute = useCallback(async <T>(
+  const execute = useCallback(async function<T>(
     txFn: () => Promise<TransactionResult>
-  ): Promise<{ success: boolean; digest?: string; error?: string; data?: T }> => {
+  ): Promise<{ success: boolean; digest?: string; error?: string; data?: T }> {
     if (!isConnected) {
       return { success: false, error: 'Wallet not connected' };
     }
