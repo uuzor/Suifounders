@@ -386,25 +386,7 @@ Would you like me to analyze a specific startup?`,
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-slate-900 to-slate-950">
-      {/* Header */}
-      <div className="bg-slate-900/80 backdrop-blur-sm border-b border-slate-700/50 px-4 py-3">
-        <div className="max-w-4xl mx-auto flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-            <svg viewBox="0 0 24 24" className="w-6 h-6 text-white" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
-          </div>
-          <div>
-            <h1 className="text-lg font-semibold text-white">Sandra</h1>
-            <p className="text-xs text-slate-400">AI Due Diligence Analyst</p>
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-            <span className="px-2 py-1 text-xs bg-emerald-500/20 text-emerald-400 rounded-full">Online</span>
-          </div>
-        </div>
-      </div>
-
+    <div className="flex flex-col h-full">
       {/* Main content area */}
       <div className="flex-1 flex overflow-hidden">
         {/* Chat area */}
