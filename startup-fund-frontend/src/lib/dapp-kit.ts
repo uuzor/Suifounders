@@ -1,11 +1,10 @@
-import { createDAppKit } from '@mysten/dapp-kit-react';
-import { SuiGrpcClient } from '@mysten/sui/grpc';
+import { createDAppKit } from '@mysten/dapp-kit-core';
 
 // Network configuration
-export const GRPC_URLS: Record<string, string> = {
-  mainnet: 'https://fullnode.mainnet.sui.io:443',
-  testnet: 'https://fullnode.testnet.sui.io:443',
-  devnet: 'https://fullnode.devnet.sui.io:443',
+export const RPC_URLS: Record<string, string> = {
+  mainnet: 'https://mainnet.mvr.mystenlabs.com',
+  testnet: 'https://testnet.mvr.mystenlabs.com',
+  devnet: 'https://devnet.mvr.mystenlabs.com',
 };
 
 // ============ Contract Package IDs ============
@@ -54,23 +53,6 @@ export const MODULES = {
   GOVERNANCE: 'governance',
   TOKEN_MARKETPLACE: 'token_marketplace',
 } as const;
-
-// ============ dApp Kit Instance ============
-
-export const dAppKit = createDAppKit({
-  networks: ['testnet', 'mainnet'],
-  defaultNetwork: 'testnet',
-  createClient: (network) =>
-    new SuiGrpcClient({ network, baseUrl: GRPC_URLS[network] }),
-  autoConnect: true,
-});
-
-// TypeScript augmentation for hooks
-declare module '@mysten/dapp-kit-react' {
-  interface Register {
-    dAppKit: typeof dAppKit;
-  }
-}
 
 // ============ Helper Functions ============
 
