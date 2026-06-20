@@ -16,6 +16,7 @@ import { useState } from 'react';
 
 const navItems = [
   { label: 'Discover', href: '/discover', icon: Search },
+  { label: 'AI Analyst', href: '/ai-analyst', icon: Layers },
   { label: 'Marketplace', href: '/marketplace', icon: Layers },
   { label: 'Governance', href: '/governance', icon: Wallet },
 ];
