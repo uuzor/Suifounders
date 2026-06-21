@@ -4,19 +4,17 @@
  * Custom wallet connection hook with enhanced functionality
  */
 
-import { useCurrentAccount, useCurrentNetwork, useWalletConnection } from '@mysten/dapp-kit-react';
+import { useCurrentAccount, useCurrentNetwork } from '@mysten/dapp-kit-react';
 import { useState, useCallback } from 'react';
-import type { TransactionResult } from '@/lib/contracts/types';
 import { getExplorerUrl } from '@/lib/contracts/transactions';
 
 // ============ Connection Hook ============
 
 export function useWallet() {
   const account = useCurrentAccount();
-  const connection = useWalletConnection();
   const network = useCurrentNetwork();
 
-  const isConnected = connection.isConnected;
+  const isConnected = !!account;
   const address = account?.address || null;
 
   const shortAddress = address 
@@ -28,13 +26,7 @@ export function useWallet() {
     isConnected,
     address,
     shortAddress,
-    connectionStatus: connection.status,
-    wallet: connection.wallet,
     network,
-    
-    // Actions (no-op in v2, wallet handles connection)
-    connect: () => {},
-    disconnect: () => {},
     
     // Explorer
     getExplorerUrl: (digest: string) => getExplorerUrl(digest, network),
@@ -48,33 +40,36 @@ export function useTransaction() {
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const execute = useCallback(async function<T>(
-    txFn: () => Promise<TransactionResult>
-  ): Promise<{ success: boolean; digest?: string; error?: string; data?: T }> {
-    if (!isConnected) {
-      return { success: false, error: 'Wallet not connected' };
-    }
-
-    setIsPending(true);
-    setError(null);
-
-    try {
-      const result = await txFn();
-
-      if (!result.success) {
-        setError(result.error || 'Transaction failed');
-        return { success: false, error: result.error };
+  const execute = useCallback(
+    async (
+      txFn: () => Promise<{ success: boolean; digest?: string; error?: string }>
+    ): Promise<{ success: boolean; digest?: string; error?: string }> => {
+      if (!isConnected) {
+        return { success: false, error: 'Wallet not connected' };
       }
 
-      return { success: true, digest: result.digest };
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
-    } finally {
-      setIsPending(false);
-    }
-  }, [isConnected]);
+      setIsPending(true);
+      setError(null);
+
+      try {
+        const result = await txFn();
+
+        if (!result.success) {
+          setError(result.error || 'Transaction failed');
+          return { success: false, error: result.error };
+        }
+
+        return { success: true, digest: result.digest };
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        setError(errorMessage);
+        return { success: false, error: errorMessage };
+      } finally {
+        setIsPending(false);
+      }
+    },
+    [isConnected]
+  );
 
   const reset = useCallback(() => {
     setError(null);

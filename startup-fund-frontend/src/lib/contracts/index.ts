@@ -11,3 +11,6 @@ export * from './queries';
 
 // Transactions (write operations)
 export * from './transactions';
+
+// Marketplace (PTB-based)
+export * from './marketplace';
